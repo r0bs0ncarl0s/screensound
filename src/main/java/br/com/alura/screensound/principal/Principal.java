@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 public class Principal {
     private final ArtistaRepository repositorio;
+    
     private Scanner leitura = new Scanner(System.in);
 
     public Principal(ArtistaRepository repositorio) {
@@ -25,12 +26,14 @@ public class Principal {
             var menu = """
                     *** Screen Sound Músicas ***                    
                                         
-                    1- Cadastrar artistas
-                    2- Cadastrar músicas
-                    3- Listar músicas
-                    4- Buscar músicas por artistas
-                    5- Pesquisar dados sobre um artista
-                                    
+                    1 - Cadastrar artistas
+                    2 - Cadastrar músicas
+                    3 - Listar músicas
+                    4 - Buscar músicas por artistas
+                    5 - Buscar artistas por música
+                    6 - Pesquisar dados sobre um artista
+                    7 - Pesquisar qtd. músicas cadastradas por artista
+                    8 - Listar artistas cadastrados com suas músicas                 
                     9 - Sair
                     """;
 
@@ -52,8 +55,17 @@ public class Principal {
                     buscarMusicasPorArtista();
                     break;
                 case 5:
+                    buscarArtistaPorMusica();
+                    break;    
+                case 6:
                     pesquisarDadosDoArtista();
                     break;
+                case 7:
+                    qtdMusicasPorArtista();
+                    break;
+                case 8:
+                    listarTodosArtistasComSuasMusicas();
+                    break;    
                 case 9:
                     System.out.println("Encerrando a aplicação!");
                     break;
@@ -63,7 +75,7 @@ public class Principal {
         }
     }
 
-    private void pesquisarDadosDoArtista() {
+	private void pesquisarDadosDoArtista() {
         System.out.println("Pesquisar dados sobre qual artista? ");
         var nome = leitura.nextLine();
         var resposta = ConsultaChatGPT.obterInformacao(nome);
@@ -113,4 +125,37 @@ public class Principal {
             cadastrarNovo = leitura.nextLine();
         }
     }
+    
+    private void buscarArtistaPorMusica() {
+    	System.out.println("Buscar artista por qual música? ");
+        var nomeMusica = leitura.nextLine();
+        List<Artista> artistas = repositorio.buscaArtistaPorMusicas(nomeMusica);
+        artistas.forEach(e -> System.out.println("Artista: " + e.getNome()));
+	}
+    
+	private void qtdMusicasPorArtista() {
+		System.out.println("Buscar músicas de que artista? ");
+        var nome = leitura.nextLine();
+        List<Musica> musicas = repositorio.buscaMusicasPorArtista(nome);
+		System.out.println("Artista: " + musicas.get(0).getArtista().getNome() + "\nMúsica(s) cadastrada(s): " + musicas.size());
+		System.out.println("Nome das músicas:");
+		musicas.forEach(m -> System.out.println(m.getTitulo()));
+	}
+	
+
+    private void listarTodosArtistasComSuasMusicas() {
+    	List<String> listaArtistas = repositorio.listaTodosNomeArtitas();
+    	if (!listaArtistas.isEmpty()) {
+    		for (int i = 0; i < listaArtistas.size(); i++) {
+    			System.out.println("\nArtista: \n" + listaArtistas.get(i));
+    			List<Musica> musicas = repositorio.buscaMusicasPorArtista(listaArtistas.get(i));
+    			System.out.println("Músicas:");
+    			if(!musicas.isEmpty()) {
+    				musicas.forEach(m -> System.out.println(m.getTitulo()));
+    			}else {
+    				System.out.println("Nenhuma música encontrada");
+    			}
+			}	
+    	}
+	}
 }

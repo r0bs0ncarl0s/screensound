@@ -14,6 +14,7 @@ public class Musica {
     private Artista artista;
 
     public Musica() {}
+    
     public Musica(String nomeMusica) {
         this.titulo = nomeMusica;
     }
